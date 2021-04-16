@@ -1,0 +1,64 @@
+.tt-tk p{
+    color: gray;
+    padding: 15px;
+    font-weight: 500;
+    font-size: 30px;
+}
+.tt-tk{
+    width: 100%;
+    height: 78px;
+    margin-bottom: 20px;
+    box-shadow: -2px 2px 2px gray;
+}
+.all-tk{
+    width: 100%;
+    height: 130px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 25px;
+
+}
+.item{
+    border: 3px solid #cccccc;
+    border-radius: 7px;
+    position: relative;
+}
+.item a{
+    text-decoration: none;
+    transition: .3s;
+
+}
+.item-top{
+    width: 100%;
+    height: 70%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.item-top-left p i{
+   color: white;
+   font-size: 55px;
+   margin-left: 15px;
+   position: absolute;
+   top: 15px;
+}
+.item-bottom{
+    width: 100%;
+    height: 30%;
+    background-color: #f3f3f3;
+}
+.item-top-right{
+    color: white;
+    position: relative;
+}
+.item-top-right .s{
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    font-size: 30px;
+}
+.item-top-right .m{
+    position: absolute;
+    top: 50px;
+}
+

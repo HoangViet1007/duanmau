@@ -1,0 +1,135 @@
+<?php
+    require_once "../../config.php" ; 
+    require_once APP_PATH."/dao/pdo.php" ; 
+
+    // nhận dữ liệu tù from
+    $ten_hh = trim($_POST['ten_hh']) ; 
+    $ten_hhErr = "" ; 
+
+    $don_gia = $_POST['don_gia'] ; 
+    $don_giaErr = "" ; 
+
+    $giam_gia = $_POST['giam_gia'] ; 
+    $giam_giaErr = "" ; 
+
+    $hinh = $_FILES['hinh'] ; 
+    $hinhErr = "" ; 
+
+    $ngay_nhap = $_POST['ngay_nhap'] ; 
+    $ngay_nhapErr = "" ; 
+
+    $mo_ta = $_POST['mo_ta'] ; 
+    $mo_taErr = "" ; 
+
+    $dac_biet = $_POST['dac_biet'];
+    $dac_bietErr = "" ; 
+
+    $so_luot_xem = $view = 1 ; 
+
+    $ma_loai = $_POST['ma_loai'] ; 
+    $ma_loaiErr = "" ; 
+
+    // validate
+    // tên
+    if(strlen($ten_hh) == 0){
+        $ten_hhErr = "Hãy nhập tên hàng hóa" ; 
+    }
+    if(strlen($ten_hh) < 3){
+        $ten_hhErr = "Tên hàng hóa không hợp lệ !" ; 
+    }
+    // đơn giá
+    if( strlen($don_gia) == 0 || $don_gia <= 0 ){
+        $don_giaErr = "Gía không hợp lệ !" ; 
+    }
+ 
+     // giảm giá
+    if( strlen($giam_gia) == 0 || $giam_gia <= 0 || strlen($giam_gia) > 3){
+        $giam_giaErr = "Giảm giá không hợp lệ !" ; 
+    }
+  
+    // ngày nhập
+    if(strlen($ngay_nhap) == 0 ){
+        $ngay_nhapErr = "Hãy nhập ngày nhập hàng hóa " ; 
+    }
+    if(strtotime("now")-strtotime($ngay_nhap) < 0 ){
+        $ngay_nhapErr = "Ngày nhập không hợp lệ !" ; 
+    }
+
+    if (!validateDate($ngay_nhap, 'd/m/Y')) {
+        $ngay_nhapErr = "Vui lòng nhập ngày tháng năm đúng định dạng dd/mm/YYYY (VD : 08/09/2001)";
+    }else{
+        $arr=explode("/",$ngay_nhap); // cái này đang là mảng các chuỗi 
+        $mm=$arr[0]; // first element of the array is month
+        $dd=$arr[1]; // second element is date
+        $yy=$arr[2]; // third element is year
+        if(!checkdate($mm,$dd,$yy)){
+            $ngay_nhapErr = "Vui lòng nhập ngày tháng năm chính xác !";
+        }else {
+           $tmp = array_reverse($arr) ; 
+           // ghép các mảng thành chuỗi 
+           $ngay_nhap_save = implode("-",$tmp) ; 
+        }
+    }
+    
+    // mô tả 
+    if(empty($_POST['mo_ta'])){
+        $mo_taErr = "Hãy nhập mô tả sản phẩm !" ; 
+    }
+  
+    // updateload anh  
+    // check ảnh 
+    // updateload anh
+    $dir = "../../public/image/product/";
+    $target_file = $dir . basename($hinh['name']);
+    $filename = "";
+    $path = "";
+    $sizeanh = 1500000;
+    $typeanh =  array('jpg', 'png', 'jpeg','bmp');
+    $kieu = pathinfo($target_file, PATHINFO_EXTENSION);
+    $check = getimagesize($_FILES['hinh']['tmp_name']);
+    if($_FILES['hinh']['size'] <= 0  ){
+        $hinhErr = "Hãy nhập hình ảnh !";
+    } 
+    elseif(!($check !== false)) {
+        $hinhErr = "Hãy nhập ảnh hợp lệ !";
+    }   
+    elseif ($hinh['size'] > $sizeanh) {
+        $hinhErr = "File ảnh quá lớn. Vui lòng chọn ảnh khác !";
+    }
+    elseif(!in_array($kieu, $typeanh)){
+        $hinhErr = "Chỉ được upload các định dạng JPG, PNG, JPEG , BMP!";
+    } 
+    else if ($hinh['size'] > 0 && $hinh['size'] < $sizeanh) {
+        $filename = uniqid() . "_" . $hinh['name'];
+        move_uploaded_file($hinh['tmp_name'], "../../public/image/product/" . $filename);
+        $path = "public/image/product/" . $filename;
+    } 
+    else{
+        $hinhErr = "";  
+    }
+    
+
+   
+
+    // hiển thị lỗi
+    if($ten_hhErr.$don_giaErr.$giam_giaErr.$hinhErr.$ngay_nhapErr.$mo_taErr != ""){
+        header('location:'.BASE_URL."admin/hang_hoa/new.php?ten_hherr=$ten_hhErr&don_giaerr=$don_giaErr&giam_giaerr=$giam_giaErr&hinherr=$hinhErr&ngay_nhaperr=$ngay_nhapErr&mo_taerr=$mo_taErr") ; 
+        die ; 
+    }
+
+
+
+    $sql = "INSERT INTO hang_hoa (ten_hh,don_gia,giam_gia,hinh,ngay_nhap,mo_ta,dac_biet,so_luot_xem,ma_loai)
+                                VALUES 
+                                ('$ten_hh','$don_gia','$giam_gia','$path','$ngay_nhap_save','$mo_ta',$dac_biet,'$view','$ma_loai')" ; 
+    insert_update_delete($sql) ; 
+    header("location:".BASE_URL."admin/hang_hoa/list.php?msg=Thêm hàng hóa thành công !") ; 
+
+
+    
+     
+
+
+
+
+?>
